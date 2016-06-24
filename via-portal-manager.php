@@ -54,9 +54,7 @@ function vpm_autoloader( $class ) {
 		}
 
 		if ( file_exists( "{$dir}/class.{$name}.php" ) ) {
-			if (WP_DEBUG) {
-				error_log("Loading class {$class} from {$dir}/class.{$name}.php");
-			}
+
 			require_once "{$dir}/class.{$name}.php";
 		}
 	}

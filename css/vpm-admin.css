@@ -1,0 +1,41 @@
+.vpm-row {
+    padding: 10px 5px;
+}
+.vpm-setting-col > select {
+    max-width: 487px;
+    min-width: 300px;
+    width: 80%;
+}
+.vpm-label-col.vpm-settings-array > input[type="text"]{
+    min-width: 150px;
+    max-width: 300px;
+    width: 50%;
+}
+.vpm-label-col > label {
+    font-weight: 700;
+    font-size: 110%;
+}
+.vpm-label-col label.vpm-admin-setting {
+    display: inline-block;
+    min-width: 130px;
+    max-width: 184px;
+    width: 30%;
+}
+input.vpm-input-numeric {
+    width: 30%;
+    min-width: 180px;
+    max-width: 200px;
+}
+.vpm-setting-col > input[type="url"] {
+    min-width: 300px;
+    width: 100%;
+    max-width: 487px;
+}
+div.vpm-setting-col input[type="file"] {
+    width: 90px;
+    color: transparent;
+}
+span.vpm-delete-lnk {
+    margin-left: 20px;
+    text-decoration: underline;
+}

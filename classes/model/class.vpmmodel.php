@@ -1,5 +1,4 @@
 <?php
-
 /*
 License:
 
@@ -47,19 +46,49 @@ class vpmModel {
 		$this->settings = apply_filters( "vpm_{$this->type}_settings", array() );
 	}
 
+	public function getSettingDefs() {
+		return $this->settings;
+	}
+
 	public function load( $cpt_id = null ) {
 
-		if (is_null($cpt_id)) {
+		if (empty($cpt_id)) {
 
 			global $post;
 			$cpt_id = $post->ID;
 		}
 
-		foreach( $this->settings as $setting => $type ) {
+		foreach( $this->settings as $setting => $definition ) {
 
+			$value = get_post_meta( $cpt_id, $setting );
 			// grab post meta (settings) as array(s)
-			$this->options[$setting] = get_post_meta( $cpt_id, $setting );
+			switch( $definition['type'] ) {
+				case 'array':
+
+					$value = (empty($value) ? array() : $value);
+					break;
+
+				case 'int':
+					$value = (empty($value) ? 0 : $value[0]);
+					break;
+
+				case 'string':
+				case 'url':
+					$value = (empty($value) ? '' : $value[0]);
+					break;
+
+				case 'file':
+					$value = (empty($value) ? array() : $value[0]);
+					break;
+
+				default:
+					$value = (empty($value) ? null : $value[0]);
+			}
+
+			$this->options[$setting] = $value;
 		}
+
+		return $this->options;
 	}
 
 	public function save( $cpt_id, $options = null ) {
@@ -87,5 +116,53 @@ class vpmModel {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Sanitize supplied field value(s) depending on data type
+	 *
+	 * @param $field - The data to sanitize
+	 * @return array|int|string
+	 */
+	public function sanitize( $field ) {
+
+		if ( ! is_numeric( $field ) ) {
+
+			if ( is_array( $field ) ) {
+
+				foreach( $field as $key => $val ) {
+					$field[$key] = $this->sanitize( $val );
+				}
+			}
+
+			if ( is_object( $field ) ) {
+
+				foreach( $field as $key => $val ) {
+					$field->{$key} = $this->sanitize( $val );
+				}
+			}
+
+			if ( (! is_array( $field ) ) && ctype_alpha( $field ) ||
+				( (! is_array( $field ) ) && strtotime( $field ) ) ||
+				( (! is_array( $field ) ) && is_string( $field ) ) ) {
+
+				$field = sanitize_text_field( $field ) ;
+			}
+
+		}
+		else {
+
+			if ( is_float( $field + 1 ) ) {
+
+				$field = sanitize_text_field( $field );
+			}
+
+			if ( is_int( $field + 1 ) ) {
+
+				$field = intval( $field );
+			}
+		}
+
+		return $field;
 	}
 }
