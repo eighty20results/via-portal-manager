@@ -64,8 +64,16 @@ class vpmModel {
 			// grab post meta (settings) as array(s)
 			switch( $definition['type'] ) {
 				case 'array':
+					
+					// Explode & trim the array values
+					$value = ( empty($value) ? array() : array_map('trim',explode(";",$value[0])) );
 
-					$value = (empty($value) ? array() : $value);
+					foreach( $value as $k => $v ) {
+						
+						if ( ! empty($v)) {
+							$value[$k] = $v;
+						}
+					}
 					break;
 
 				case 'int':
