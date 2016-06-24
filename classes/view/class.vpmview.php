@@ -104,9 +104,11 @@ class vpmView
                 <option value="-1"> --- </option><?php
                 }
 
-                foreach( $value as $key =>$entry ) { ?>
-                <option value="<?php echo $key; ?>"><?php echo $entry; ?></option>
-                    <?php
+                foreach( $value as $key =>$entry ) {
+                    if (!empty($entry)) { ?>
+                    <option value="<?php echo $key; ?>"><?php echo $entry; ?></option>
+                        <?php
+                    }
                 } ?>
             </select>
             <input type="hidden" class="vpm-select-values" name="<?php echo "vpm-array-hidden-{$name}"; ?>" id="vpm-array-hidden-<?php echo "{$name}_id" ?>">
