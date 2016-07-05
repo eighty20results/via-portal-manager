@@ -28,9 +28,16 @@ var configure_cpt_settings = {
         this.remove_buttons = jQuery('input.vpm-rm-button');
         this.file_selected = jQuery('input.vpm-input-file:file');
         this.delete_file = jQuery('span.vpm-delete-lnk > a');
+        this.default_playback = jQuery('input#default_playback_order_id');
+        this.current_playback = jQuery('input#current_playback_order_id');
 
         var self = this;
 
+        // Set the current playback order equal to the default playback order
+        if ('' === self.current_playback.val() && '' !== self.default_playback.val()) {
+            self.current_playback.val(self.default_playback.val());
+        }
+        
         self.add_buttons.unbind('click').on('click', function() {
             var element = this;
             var setting_name = jQuery(element).closest('.vpm-column.vpm-settings-array').find('input.vpm-setting-name').val();
@@ -61,12 +68,32 @@ var configure_cpt_settings = {
         });
 
         // Force all drop-down options to get selected on submit/save of post/page.
-        jQuery('#publish').on('click', function() {
-            
+/*        jQuery('#publish').on('click', function() {
+
+            event.preventDefault();
+
+            var hidden_select_vars = jQuery('input[name^="vpm-array-hidden*"]');
+
+            hidden_select_vars.each(function() {
+
+                self.remove_buttons.each(function() {
+
+                    var element = this;
+                    var setting_name = jQuery(this).closest('.vpm-row').find('input.vpm-setting-name').val();
+
+                    self.add_on_save( element, setting_name );
+                });
+            });
+
+            console.log("Submitting form: ", )
+            jQuery('#form').submit();
+
             jQuery('div.vpm-table select option').each(function() {
                 jQuery(this).prop('selected', true);
             });
+
         });
+*/
 
         self.file_selected.unbind('click').on('click', function() {
 
@@ -98,8 +125,80 @@ var configure_cpt_settings = {
     remove_from_select: function( element, $var_name ) {
         "use strict";
 
+        var self = this;
+
         var select = jQuery('select#' + $var_name + '_select_id');
-        select.find(':selected').remove();
+        var selected = select.find(':selected');
+        var selIndex = select.prop('selectedIndex');
+        var counter = jQuery('select#' + $var_name + "_select_id option").size();
+
+        var hidden = jQuery('input#vpm-array-hidden-' + $var_name + '_id');
+        var entries = hidden.val().split(';');
+
+        window.console.log("Selected Index: ", selIndex);
+        window.console.log("Entries: ", entries);
+
+        var idx = entries.indexOf(selected.text());
+        window.console.log("Selected: ", selected);
+
+        if (idx !== -1 ) {
+            entries.splice(idx, 1);
+            selected.remove();
+
+            var $to_hidden = self._save_to_hidden( jQuery('select#' + $var_name + '_select_id'), counter);
+            hidden.val($to_hidden);
+        }
+
+    },
+/*    add_on_save: function( element, $var_name ) {
+        "use strict";
+
+        var self = this;
+
+        var hidden = jQuery('input#vpm-array-hidden-' + $var_name + "_id");
+        var select = jQuery('select#' + $var_name + "_select_id");
+
+        var counter = jQuery('select#' + $var_name + "_select_id option").size();
+
+        var $to_hidden = self._save_to_hidden(select, counter);
+
+        hidden.val($to_hidden);
+        window.console.log("List of added resources: " + $to_hidden);
+    }, */
+    _save_to_hidden: function(select, counter ) {
+        "use strict";
+
+        var $to_hidden = '';
+        var resource_list = [];
+
+        // Grab all existing entries (except ---)
+        select.find('option').each(function() {
+
+            var opt = jQuery(this);
+            var $res = opt.text();
+
+            // The option contains text and it's not the default ---
+            if ( $res.length > 0 && $res.indexOf('---') === -1) {
+                window.console.log("Adding new resource to list: " + $res);
+                resource_list.push($res);
+            }
+
+            if ( 1 === counter && $res.indexOf('---') > -1) {
+                select.find('option').remove();
+            }
+        });
+
+        window.console.log("List of added resources: ", resource_list);
+
+        // concatenate list & separate w/;
+        for (var i in resource_list) {
+
+            if (resource_list[i].length) {
+                $to_hidden += resource_list[i] + ";";
+            }
+        }
+
+        return $to_hidden;
     },
     add_to_select: function( element, $var_name ) {
         "use strict";
@@ -114,7 +213,6 @@ var configure_cpt_settings = {
         var $to_hidden = '';
         var counter = jQuery('select#' + $var_name + "_select_id option").size();
         var resource_list = [];
-
 
         if ( false === self.is_url($new_value) ) {
             window.alert(vpmm.messages.no_http);
