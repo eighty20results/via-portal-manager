@@ -87,6 +87,8 @@ class vpmView
      */
     public function showSetting_array( $name, $value, $definition ) {
 
+	    error_log( "VPM View: Array value before filter: " . print_r($value, true) );
+
         // filter / set a default value if needed.
         $value = apply_filters('vpm_setting_array_default_value', $value, $name, $definition[$name] );
 
@@ -100,18 +102,20 @@ class vpmView
         <div class="vpm-column vpm-setting-col vpm-settings-array">
             <select size="4" id="<?php echo "{$name}_select_id"; ?>" class="<?php echo "{$name}_select"; ?>" multiple="multiple"><?php
 
+                error_log( "VPM View: Array value: " . print_r($value, true) );
+
                 if (empty($value)) { ?>
                 <option value="-1"> --- </option><?php
                 }
 
-                foreach( $value as $key =>$entry ) {
+                foreach( $value as $key => $entry ) {
                     if (!empty($entry)) { ?>
                     <option value="<?php echo $key; ?>"><?php echo $entry; ?></option>
                         <?php
                     }
                 } ?>
             </select>
-            <input type="hidden" class="vpm-select-values" name="<?php echo "vpm-array-hidden-{$name}"; ?>" id="vpm-array-hidden-<?php echo "{$name}_id" ?>">
+            <input type="hidden" class="vpm-select-values" name="<?php echo "vpm-array-hidden-{$name}"; ?>" id="vpm-array-hidden-<?php echo "{$name}_id" ?>" <?php echo (!empty($value) ? 'value="' . implode( ';', $value) . '" ' : null); ?>>
             <input type="button" class="vpm-rm-button button-secondary button-small" id="<?php echo "{$name}_rm_btn"; ?>" value="<?php _e("Remove", "vpmlang"); ?>">
         </div><?php
         return ob_get_contents();
