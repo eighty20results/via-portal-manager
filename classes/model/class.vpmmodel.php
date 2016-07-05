@@ -126,6 +126,10 @@ class vpmModel {
 
 		return true;
 	}
+	
+	public function sort_by_var( $cpt_id, $options, $var_name ) {
+		
+	}
 
 	/**
 	 * Sanitize supplied field value(s) depending on data type
