@@ -61,12 +61,13 @@ class vpmModel {
 		foreach( $this->settings as $setting => $definition ) {
 
 			$value = get_post_meta( $cpt_id, $setting );
+
 			// grab post meta (settings) as array(s)
 			switch( $definition['type'] ) {
 				case 'array':
 					
 					// Explode & trim the array values
-					$value = ( empty($value) ? array() : array_map('trim',explode(";",$value[0])) );
+					$value = ( empty($value) ? array() : array_map('trim', explode( ";",$value[0] ) ) );
 
 					foreach( $value as $k => $v ) {
 						
@@ -108,7 +109,7 @@ class vpmModel {
 		foreach( $this->options as $setting => $value ) {
 
 			$tmp = get_post_meta( $cpt_id, $setting, $value );
-
+			
 			if ( empty($tmp) ) {
 				add_post_meta( $cpt_id, $setting, $value );
 			} else {
