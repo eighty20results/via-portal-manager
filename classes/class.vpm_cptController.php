@@ -278,7 +278,7 @@ class vpm_cptController
             $pvn_array = explode('-', $pvar_name);
 
             if (WP_DEBUG) {
-                error_log("VPM: Processing reuqest key {$pvar_name}: {$new_val}");
+                error_log("VPM: Processing request key {$pvar_name}: {$new_val}");
             }
 
             // grab the last element (the actual post meta key)
@@ -318,8 +318,52 @@ class vpm_cptController
             
                 $errors[] = __("ERROR: Must specify a value for the required {$var_name} setting!", "vpmlang");
             
-            } elseif ( ! is_null($new_val) ) {
+            } elseif ( ! is_null($new_val) && false === strpos($pvar_name, 'vpm-file-delete-') ) {
 
+                if (WP_DEBUG) {
+                    error_log("Updating post meta for {$post_id}, key: {$var_name} to {$new_val}.");
+                }
+
+                $array_exists = false;
+                $old_pvar = $var_name;
+
+                // Check if we're processing the current playback order (TODO: Update the menu order too! )
+                if ( false !== strpos( $pvar_name, 'current_playback_order') && empty($new_val) ) {
+
+	                if (WP_DEBUG) {
+		                error_log("current_playback order is empty, so looking up the default order");
+	                }
+
+	                $new_val = get_post_meta( $post_id, 'default_playback_order', true);
+
+	                if ( empty( $new_val ) ) {
+		                $new_val = $this->model->sanitize( $_REQUEST["vpm-int-default_playback_order"]);
+	                }
+                }
+
+
+                // check if we've got the hidden (select) for an array
+                if ( false !== strpos( $pvar_name, "vpm-array-hidden-{$var_name}" ) ) {
+
+	                if (WP_DEBUG) {
+		                error_log("VPM: Processing hidden array field");
+	                }
+
+                    $array_exists = get_post_meta( $post_id, $var_name, true);
+                    // $pvar_name = "vpm-array-{$var_name}";
+
+                    if ( !empty($array_exists) && ( empty( $new_val ) ) ) {
+
+                        if (WP_DEBUG) {
+                            error_log("Have a saved value and an empty 'new' one...: " . print_r($array_exists, true) );
+                        }
+
+                        // saving the existing value.
+                        $new_val = $array_exists;
+                    }
+                }
+
+                $pvar_name = $old_pvar;
                 update_post_meta($post_id, $var_name, $new_val );
 
                 if ( ( false === ( $c_val = get_post_meta( $post_id, $var_name, true ) ) ) || ( $c_val != $new_val ) ){
@@ -354,7 +398,7 @@ class vpm_cptController
                 $is_loaded = get_post_meta($post_id, $vpm_file_matches[1][$key], true);
 
                 if (WP_DEBUG) {
-                    error_log("VPM: Found: " . print_r($is_loaded, true));
+                    error_log( "VPM: Found pre-existing entry: " . print_r( (empty($is_loaded) ? 'Nope' : $is_loaded), true ) );
                 }
 
                 if ( ! empty($_FILES[$file_setting]['name']) ) {
