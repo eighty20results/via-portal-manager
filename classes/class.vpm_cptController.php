@@ -37,6 +37,9 @@ class vpm_cptController
     /** @var    vpmView $view Instance of the view class */
     private $view;
 
+    /** @var array List of download IDs (download manager) */
+    private $downloads = array();
+
     /**
      * vpm_cptController constructor.
      * @param string $type Type oF CPT
@@ -435,16 +438,64 @@ class vpm_cptController
 
                             // add_post_meta($post_id, $vpm_file_matches[1][$key], $upload);
                             update_post_meta($post_id, $vpm_file_matches[1][$key], $upload);
-                        }
+
+                            // only load to Download Monitor if the plugin is active/loaded.
+                            if ( function_exists('__download_monitor_main')) {
+
+                                if (WP_DEBUG) {
+                                    error_log("VPM: Saving file info as Download Monitor upload");
+                                }
+
+                                // save to the download manager
+                                $ndl = new vpmDownloads();
+
+                                /*
+                                $parent_category = $upload->get_segment_category( $post->post_title );
+
+                                if (WP_DEBUG) {
+                                    error_log("VPM: Using parent category (ID: {$parent_category})");
+                                }
+                                */
+
+                                $file_category = $ndl->get_segment_category(
+                                    $setting_defs[$vpm_file_matches[1][$key]]['label'] /* ,
+                                    $parent_category */
+                                );
+
+                                if (WP_DEBUG) {
+                                    error_log("VPM: Assigned to category for this file type (ID: {$file_category})");
+                                }
+
+                                $dl_title = sprintf( __("%s for %s", "vpmlang"), $setting_defs[$vpm_file_matches[1][$key]]['label'], $post->post_title);
+
+                                if (WP_DEBUG) {
+                                    error_log("VPM: Attempting to add uploaded file info to Download Monitor.");
+                                }
+
+                                $dl_status = $ndl->save_upload( $upload['url'], $dl_title , null, null, $file_category );
+
+                                if (WP_DEBUG) {
+                                    error_log("VPM: Added the uploaded file info to Download Monitor. Success? " . ( $dl_status['status'] ? 'Yes' : 'No'));
+                                }
+
+                                // save the download status for the file
+                                if ( false === $dl_status['status'] ) {
+                                    $errors[] = $dl_status['message'];
+                                } else {
+                                    $this->downloads[] = $dl_status['status'];
+                                }
+
+                            } // end of function_exists()
+                        } // end of if successfully processed as upload
                     } else {
                         $errors[] = sprintf(
                             __("ERROR: %s is not a supported file type to upload for '%s'", "vpmlang" ),
                             $_FILES[$file_setting]['name'],
                             $setting_defs[$vpm_file_matches[1][$key]]['label']
                         );
-                    }
+                    } // end of supported file type test
                 }
-                elseif (empty($_FILES[$file_setting]['name']) && in_array($vpm_file_matches[1][$key], $required_files && empty($is_loaded))) {
+                elseif (empty($_FILES[$file_setting]['name']) && in_array($vpm_file_matches[1][$key], $required_files) && empty($is_loaded) ) {
 
                     // File not chosen in input, it's a required file & we don't have it saved anywhere.
                     $errors[] = sprintf(
