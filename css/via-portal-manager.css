@@ -1,0 +1,164 @@
+.clearfix {
+    clear: both;
+    content: "";
+}
+.vpm-hidden {
+    display: none;
+}
+.vpm-toggle-link {
+/*    font-size: 9px;
+    color: gray;
+    text-decoration: initial;
+    font-weight: initial;
+    box-shadow: none;
+    */
+}
+.vpm-video-show {
+    margin: 50px auto;
+}
+span.vpm-header-text {
+    font-size: 1.1em;
+}
+.vpm-show-videos {
+    width: 100%;
+/*    width: 80%;
+    max-width: 640px;
+    */
+    margin: 20px auto;
+    padding-bottom: 20px;
+}
+.vpm-show-videos a.button {
+    -webkit-border-radius: 8px;
+    -moz-border-radius: 8px;
+    border-radius: 8px;
+    font-family: Arial;
+    color: #ffffff;
+    font-size: 20px;
+    background: #b3b3b3;
+    padding: 5px 20px;
+    border: solid #ebebeb 2px;
+    text-decoration: none;
+}
+.vpm-table a.button:hover {
+    background: #ffffff;
+    color: #b3b3b3;
+    text-decoration: none;
+}
+.vpm-show-videos a {
+    float: left;
+}
+.vpm-show-videos a:last-child {
+    float: right;
+}
+/* Make video shortcode embeds responsive */
+.wp-video, video.wp-video-shortcode, .mejs-container, .mejs-overlay.load {
+    width: 100% !important;
+    height: 100% !important;
+}
+.mejs-container {
+    padding-top: 56.25%;
+}
+.wp-video, video.wp-video-shortcode {
+    max-width: 100% !important;
+}
+video.wp-video-shortcode {
+    position: relative;
+}
+.mejs-mediaelement {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+.mejs-controls {
+    display: none;
+}
+.mejs-overlay-play {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: auto !important;
+    height: auto !important;
+}
+.vpm-link a {
+    font-weight: initial;
+}
+div.vpm-separator {
+    width: 98%;
+    margin: 10px auto;
+    height: 2px;
+    background-color: #ddd;
+}
+div.vpm-table div.vpm-separator {
+    width: 100%;
+    background-color: #fff;
+
+}
+/* Table definition (using DIVs) */
+div.vpm-table {
+    width: 90%;
+    margin: 20px auto;
+    padding: 10px;
+    background-color: #e5e5e5;
+    display: inline-block;
+}
+div.vpm-table div.vpm-table-row {
+    width: 100%;
+}
+div.vpm-table div.vpm-thead {
+
+}
+div.vpm-table div.vpm-tbody {
+
+}
+div.vpm-thead div.vpm-table-cell {
+    font-weight: 600;
+}
+div.vpm-table-row div.vpm-table-cell {
+    /* width: 100%; */
+    float: left;
+}
+div.vpm-table .vpm-1-col {
+    width: 100%;
+}
+div.vpm-table .vpm-2-col {
+    width: 49%;
+}
+div.vpm-table .vpm-3-col {
+    width: 33%;
+}
+div.vpm-table .vpm-4-col {
+    width: 24%;
+}
+div.vpm-table .vpm-uneven-col-1 {
+    width: 80%;
+}
+div.vpm-table .vpm-uneven-col-2 {
+    width: 20%;
+    text-align: center;
+}
+div.vpm-table .vpm-uneven-col-2 img {
+    margin: 0 auto;
+}
+/*
+.vpm-content-col {
+    width: 85%;
+}
+.vpm-icon {
+    width: 15%;
+    min-width: 120px;
+}
+*/
+.vpm-icon-pdf,
+.vpm-icon-default,
+.vpm-icon-file,
+.vpm-icon-png,
+.vpm-icon-jpg,
+.vpm-icon-jpeg,
+.vpm-icon-link,
+.vpm-icon-gif {
+    width: 25px;
+    height: 25px;
+}
