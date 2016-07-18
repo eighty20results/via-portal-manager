@@ -32,6 +32,7 @@ License:
 define( 'VPM_VERSION', '0.1' );
 
 define( 'VPM_PLUGIN_FILE', plugin_dir_path( __FILE__ ) . 'via-portal-manager.php' );
+define( 'VPM_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'VPM_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 
 function vpm_autoloader( $class ) {
