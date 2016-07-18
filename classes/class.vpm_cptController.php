@@ -110,6 +110,35 @@ class vpm_cptController
     public function init()
     {
         $this->load_actions();
+        $this->load_filters();
+    }
+
+    /**
+     * Is the current user an end-user & a client
+     *
+     * @return bool
+     */
+    public function is_enduser() {
+
+        if ( is_user_logged_in() && ( current_user_can('vpm_enduser') || $this->is_facilitator() )) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if the current user is a VIA facilitator (or admin/editor)
+     *
+     * @return bool
+     */
+    public function is_facilitator() {
+
+        if ( current_user_can( 'manage_options' ) || current_user_can( 'vpm_facilitator') ) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -130,6 +159,36 @@ class vpm_cptController
         add_action('admin_footer', array( $this, 'clear_admin_errors'));
 
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin'));
+    }
+
+    /**
+     * Load all filters for this class (when plugin is ready)
+     */
+    public function load_filters() {
+
+        if (WP_DEBUG) {
+            error_log("Processing filters for {$this->cpt_name}");
+        }
+
+        add_filter( "vpm-{$this->type}-controller", array( $this, 'get_controller' ), 1 );
+    }
+
+    public function get_controller( $controller ) {
+
+        if ( !is_null( $controller ) && 'vpm_cptController' === get_class( $controller ) ) {
+            return $controller;
+        }
+
+        return $this;
+    }
+
+    public function get_view() {
+
+        if ( 'vpmView' === get_class( $this->view ) ) {
+            return $this->view;
+        }
+
+        return false;
     }
 
     /**
@@ -617,15 +676,21 @@ class vpm_cptController
     /**
      * Grab an existing (or new) instance of this class
      *
+     * @param       vpm_cptController   $instance   An instance variable
      * @return      vpm_cptController    - The current instance of the class
      */
-    public static function get_instance()
+    public static function get_instance( $instance = null )
     {
 
         if (!is_null(self::$instance)) {
             return self::$instance;
         }
 
+        if ( 'vpm_cptController' === get_class($instance) ) {
+            return $instance;
+        } else {
+            return self::$instance;
+        }
         // return new vpm_cptController();
     }
 
