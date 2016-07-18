@@ -54,6 +54,8 @@ class vpmController
         add_action('admin_enqueue_scripts', array( $this, 'enqueue_admin'), 10);
         add_action('wp_enqueue_scripts', array( $this, 'enqueue_scripts'), 10 );
 
+        add_filter('vpm_roles', array( $this, 'add_default_roles'), 5, 1 );
+
         add_filter('vpm_coaching_guide_doc_filetypes', array( $this, 'document_types'));
         add_filter('vpm_facilitators_guide_link_filetypes', array( $this, 'document_types'));
         add_filter('vpm_facilitators_guide_link_filetypes', array( $this, 'document_types'));
@@ -248,14 +250,77 @@ class vpmController
         return $new;
     }
 
+    /**
+     * Define the default roles as they pertain to the user's membership level
+     *
+     * @param      array       $roles      Associative array of defined roles
+     * @return     array                   Associative array of defined roles
+     *
+     * @since 0.1 - Initially added
+     */
+    public function add_default_roles( $roles = array() ) {
+
+        $defaults = array(
+            'participant'         =>  array(
+                'role' => 'vpm_enduser',
+                'label' => __( "VIA Seminar Participant", "e20rtracker"),
+                'permissions' => array(
+                    'read' => true,
+                    'upload_files' => true
+                ),
+            ),
+            'facilitator'      =>  array(
+                'role' => 'vpm_facilitator',
+                'label' => __( "VIA Seminar Facilitator", "e20rtracker"),
+                'permissions' => array(
+                    'read' => true,
+                ),
+            )
+        );
+
+        // merge existing & any filter
+        $roles = wp_parse_args( $roles, $defaults );
+
+        return $roles;
+    }
+
+    /**
+     * WordPress plugin activation hook
+     */
     public function activation_hook()
     {
-
         if (WP_DEBUG) {
             error_log("Activating the VIA Portal Manager plugin");
         }
+
+        add_filter('vpm_roles', array( $this, 'add_default_roles'), 5, 1 );
+
+        $roles = apply_filters('vpm_roles', array(), 10, 1 );
+
+        global $wp_roles;
+
+        foreach ( $roles as $key => $user_role ) {
+
+            foreach ( $wp_roles->get_names() as $role_name => $display_name) {
+
+                if ( $role_name === $user_role['role'] ) {
+                    $wp_roles->remove_role($role_name);
+                }
+            }
+
+            if ( WP_DEBUG ) {
+                error_log("Attempting to add {$key} role ({$user_role['role']}, {$user_role['label']})");
+            }
+
+            if (! $wp_roles->add_role( $user_role['role'], $user_role['label'], $user_role['permissions'] ) ) {
+                return false;
+            }
+        }
     }
 
+    /**
+     * WordPress plugin deactivation hook
+     */
     public function deactivation_hook()
     {
 
