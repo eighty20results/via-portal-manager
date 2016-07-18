@@ -30,8 +30,243 @@ class vpmView
 
     public function __construct($cpt_name, $type)
     {
+
         $this->cpt_name = $cpt_name;
         $this->type = $type;
+
+        // Load any actions or filters for the class
+        add_action('plugins_loaded', array( $this, 'init'), 11 );
+        add_filter( "vpm-{$this->type}-view-class-instance", array( $this, 'get_instance' ), 1, 3 );
+    }
+
+    /**
+     * @param mixed     $class      Class instance (or null)
+     *
+     * @return vpmView  - Existing class instance
+     */
+    public function get_instance( $class ) {
+
+        if ( 'vpmView' !== get_class( $class ) ) {
+            $class = $this->instance;
+        }
+
+        return $class;
+    }
+
+    public function init() {
+
+        if (class_exists('SFWD_LMS')) {
+            add_filter('learndash_template', array( $this, 'load_learndash_template'), 10, 5);
+        }
+
+    }
+
+    /**
+     * Show a video section
+     *
+     * @param string        $video_url      Link to video
+     *
+     * @return  string      - HTML containing video playback
+     */
+    public function show_topic_video( $video_url ) {
+
+    	$attr = array(
+    		'src' => esc_url( $video_url ),
+		    'width' => '1024',
+		    'preload'   => true,
+		    'class' => 'vpm-video-embed',
+	    );
+
+        ob_start(); ?>
+        <div class="vpm-view-video-playback">
+	        <?php echo wp_video_shortcode( $attr ); ?>
+        </div>
+        <?php
+
+        $html = ob_get_clean();
+        return $html;
+    }
+
+    /**
+     * @param array $topic  -   Array of metadata for the topic to display
+     *
+     * @return string   - HTML for the topic meta layout
+     */
+    public function show_topic_meta( $topic ) {
+
+    	if (WP_DEBUG) {
+    		error_log("VPMMeta: Loaded topic: " . print_r( $topic, true));
+	    }
+
+        ob_start(); ?>
+	    <div class="vpm-separator"></div>
+	    <h3 class="vpm-metadata-header"><?php _e("Links & Information", "vpmlang"); ?></h3>
+        <div class="vpm-table vpm-topic-meta-view clearfix">
+	        <div class="vpm-thead">
+		        <div class="vpm-table-row clearfix">
+			        <div class="vpm-table-cell vpm-2-col vpm-uneven-col-1">
+				        <?php _e("What", "vpmlang"); ?>
+			        </div>
+			        <div class="vpm-table-cell vpm-2-col vpm-uneven-col-2">
+				        <?php _e("Type", "vpmlang"); ?>
+			        </div>
+		        </div>
+	        </div>
+	        <div class="vpm-separator clearfix"></div>
+	        <div class="vpm-tbody"><?php
+
+		        $fields  = apply_filters( "vpm_{$this->type}_settings", null );
+
+		        foreach( $topic as $key => $value ) {
+
+		        	$html = '';
+			        $value = '';
+			        $label = '';
+			        $meta_icon_css = '';
+
+		        	// process type
+			        switch ( $fields[$key]['type'] ) {
+				        case 'file':
+				        	$value = esc_url( $topic[$key]['url'] );
+							$label = esc_attr( $fields[$key]['label'] );
+							$html = "<span class='vpm-file'><a href='{$value}' title='{$label}'>{$label}</a></span>";
+
+					        echo $this->add_metadata_row( $html, $value, 'file', $topic[$key]['file'] );
+				        	break;
+
+				        case 'url':
+
+				        	if ( false === strpos( $topic[$key], '_video' ) ) {
+						        $value         = esc_url( $topic[ $key ] );
+						        $label         = esc_attr( $fields[ $key ]['label'] );
+						        $html          = "<span class='vpm-link'><a href='{$value}' title='{$label}'>{$label}</a></span>";
+
+						        echo $this->add_metadata_row( $html, $value, 'link', null );
+					        }
+				        	break;
+
+
+				        case 'array':
+
+					        $label = esc_attr( $fields[ $key ][ 'label' ] );
+							$data = explode(';', $topic[$key]);
+
+					        foreach( $data as $lnk ) {
+
+					        	if ( empty( $lnk ) ) {
+							        continue;
+						        }
+
+						        $value = esc_url( $lnk );
+						        $html          = "<span class='vpm-link'><a href='{$value}' title='{$label}'>{$value}</a></span>";
+						        echo $this->add_metadata_row( $html, $lnk, 'link', null );
+
+					        }
+
+				        	break;
+
+				        default:
+
+			        }
+		        }
+	        ?>
+	        </div>
+        </div>
+        <?php
+        $html = ob_get_clean();
+
+	    return $html;
+    }
+
+    private function get_icon_type( $type, $value = null ) {
+
+    	$class = null;
+
+    	switch( $type ) {
+
+    		case 'link':
+    			$class = 'link';
+			    break;
+
+		    case 'file':
+
+		    	$ext = 'default';
+
+		    	// extract the file type to use icon for.
+			    if ( !empty( $value ) ) {
+				    $file = wp_check_filetype( $value );
+				    $ext= $file['ext'];
+			    }
+
+			    $class = $ext;
+		    	break;
+
+		    default:
+		    	$class = "default";
+	    }
+
+	    return $class;
+    }
+
+    private function add_metadata_row( $content, $link, $type = 'link', $file = null ) {
+
+	    $icon_type =  $this->get_icon_type( $type, $file );
+    	ob_start();
+	    ?>
+	    <div class="vpm-table-row clearfix">
+		    <div class="vpm-table-cell vpm-2-col vpm-content-col vpm-uneven-col-1">
+			    <?php echo $content; ?>
+		    </div>
+		    <div class="vpm-table-cell vpm-2-col vpm-uneven-col-2 vpm-icon">
+			    <a href="<?php echo esc_url( $link ); ?>">
+				    <img class="vpm-icon-<?php echo $type; ?>" src="<?php echo plugins_url( "css/icons/{$icon_type}-icon.png", VPM_PLUGIN_FILE ); ?>"/>
+			    </a>
+		    </div>
+	    </div>
+	    <?php
+	    return ob_get_clean();
+    }
+    /**
+     * Load custom template(s) for LearnDash LMS
+     *
+     * @param       string      $filepath           - Path to existing template file
+     * @param       string      $name               - Name of template
+     * @param       array       $args               - Array of arguments for the template
+     * @param       boolean     $echo               - Whether to echo the template right away
+     * @param       boolean      $return_file_path  - Return the template path
+     *
+     * @return      string      - Path to the template file
+     */
+    public function load_learndash_template( $filepath, $name, $args, $echo, $return_file_path ) {
+
+        if (WP_DEBUG) {
+            error_log("VPMLD: {$filepath}, {$name}, " . ( !empty( $args ) ? print_r($args, true) : 'none' ) . ", {$echo}, {$return_file_path}.");
+        }
+
+        if ('topic' === $name) {
+            if ( file_exists( get_template_directory() . "/ld-templates/topic.php") ) {
+                $filepath = get_template_directory() . "/ld-templates/topic.php";
+            }
+
+            if ( file_exists( get_stylesheet_directory() . "/ld-templates/topic.php") ) {
+                $filepath = get_stylesheet_directory() . "/ld-templates/topic.php";
+            }
+
+            if ( file_exists( VPM_PLUGIN_DIR . 'ld-templates/topic.php' ) ) {
+            	$filepath = VPM_PLUGIN_DIR . 'ld-templates/topic.php';
+            }
+
+            if ( file_exists( dirname(__FILE__) . 'ld-templates/topic.php') ) {
+                $filepath = dirname(__FILE__) . 'ld-templates/topic.php';
+            }
+
+            if (WP_DEBUG) {
+                error_log("VPMLD: Going to load: {$filepath}");
+            }
+
+        }
+
+        return $filepath;
     }
 
     /**
