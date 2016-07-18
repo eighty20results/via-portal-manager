@@ -208,6 +208,16 @@ class vpmView
 	    return $class;
     }
 
+	/**
+	 * Generate a <div></div> table row for new metadata entry
+	 *
+	 * @param   string      $content        HTML containing the link itself
+	 * @param   string      $link           URL to the content/link
+	 * @param   string|null $type           Type of link (link, file)
+	 * @param   string|null $file           File being linked (when $type == 'file')
+	 *
+	 * @return string                       HTML for a table row.
+	 */
     private function add_metadata_row( $content, $link, $type = 'link', $file = null ) {
 
 	    $icon_type =  $this->get_icon_type( $type, $file );
