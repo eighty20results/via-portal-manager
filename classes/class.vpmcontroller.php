@@ -51,13 +51,32 @@ class vpmController
 
         add_action("init", array($this, "menu_settings"));
         add_action("init", array($this, "load_textdomain"), 1);
-        add_action('admin_enqueue_scripts', array( $this, 'enqueue_admin'));
+        add_action('admin_enqueue_scripts', array( $this, 'enqueue_admin'), 10);
+        add_action('wp_enqueue_scripts', array( $this, 'enqueue_scripts'), 10 );
 
         add_filter('vpm_coaching_guide_doc_filetypes', array( $this, 'document_types'));
         add_filter('vpm_facilitators_guide_link_filetypes', array( $this, 'document_types'));
         add_filter('vpm_facilitators_guide_link_filetypes', array( $this, 'document_types'));
         add_filter('vpm_consultants_guide_link_filetypes', array( $this, 'document_types'));
         add_filter('vpm_presentation_doc_filetypes', array( $this, 'presentation_types'));
+    }
+
+    /**
+     * Load front-end style sheets & JavaScripts
+     */
+    public function enqueue_scripts() {
+
+        // load to frontend page only
+        if ( !is_admin() &&  !defined('DOING_AJAX') ) {
+
+            if (WP_DEBUG) {
+                error_log("VPMC: Loading style sheets & scripts for front-end");
+            }
+
+            wp_enqueue_style( 'vpm-frontend', plugins_url( 'css/via-portal-manager.css', VPM_PLUGIN_FILE ), null, VPM_VERSION );
+            wp_enqueue_script('via-portal-manager', plugins_url( 'js/via-portal-manager.js', VPM_PLUGIN_FILE ), array( 'jquery' ), VPM_VERSION );
+
+        }
     }
 
     /**
@@ -223,10 +242,10 @@ class vpmController
             'third_party_assets' => array('type' => 'array', 'label' => __("3rd party assets (link)", "vpmlang"))
         );
 
-        $new_settings = $settings + $new;
+        // $new_settings = $settings + $new;
 
         // Merge (applies implicit array_unique())
-        return $new_settings;
+        return $new;
     }
 
     public function activation_hook()
