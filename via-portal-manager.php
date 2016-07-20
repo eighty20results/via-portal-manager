@@ -4,7 +4,7 @@
 Plugin Name: VIA Portal Manager
 Plugin URI: https://eighty20results.com/custom-programming/
 Description: Manage Custom Post Types & Integrations for the VIA Portal
-Version: 0.1
+Version: 0.2
 Author: Thomas Sjolshagen <thomas@eighty20results.com>
 Author URI: https://eighty20results.com/thomas-sjolshagen
 License: GPL2
@@ -29,7 +29,7 @@ License:
 
 */
 
-define( 'VPM_VERSION', '0.1' );
+define( 'VPM_VERSION', '0.2' );
 
 define( 'VPM_PLUGIN_FILE', plugin_dir_path( __FILE__ ) . 'via-portal-manager.php' );
 define( 'VPM_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
@@ -67,10 +67,14 @@ if ( WP_DEBUG ) {
 	error_log( "Attempting to load the vpmController class" );
 }
 
-/*
-if (!class_exists('\\vpmController') && empty($_GLOBAL['vpmController'])) {
-	$_GLOBAL['vpmController'] = new vpmController();
-}
-*/
+/**
+ * Load the one-click VPM upgrade/update process
+ */
+require 'plugin-update/plugin-update-checker.php';
+$myUpdateChecker = PucFactory::buildUpdateChecker(
+	'https://eighty20results.com/protected-content/via-portal-manager/metadata.json',
+	__FILE__
+);
 
 add_action( 'plugins_loaded', array( new vpmController(), 'controller_init' ), 11 );
+
