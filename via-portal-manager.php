@@ -70,7 +70,7 @@ if ( WP_DEBUG ) {
 /**
  * Load the one-click VPM upgrade/update process
  */
-require 'plugin-update/plugin-update-checker.php';
+require_once 'classes/plugin-update/plugin-update-checker.php';
 $myUpdateChecker = PucFactory::buildUpdateChecker(
 	'https://eighty20results.com/protected-content/via-portal-manager/metadata.json',
 	__FILE__
