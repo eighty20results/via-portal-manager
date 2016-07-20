@@ -4,11 +4,11 @@
 Plugin Name: VIA Portal Manager
 Plugin URI: https://eighty20results.com/custom-programming/
 Description: Manage Custom Post Types & Integrations for the VIA Portal
-Version: 0.2
+Version: 0.3
 Author: Thomas Sjolshagen <thomas@eighty20results.com>
 Author URI: https://eighty20results.com/thomas-sjolshagen
 License: GPL2
-Text Domain: e20rsequence
+Text Domain: vpmlang
 Domain Path: /languages
 License:
 
@@ -29,7 +29,7 @@ License:
 
 */
 
-define( 'VPM_VERSION', '0.2' );
+define( 'VPM_VERSION', '0.3' );
 
 define( 'VPM_PLUGIN_FILE', plugin_dir_path( __FILE__ ) . 'via-portal-manager.php' );
 define( 'VPM_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
