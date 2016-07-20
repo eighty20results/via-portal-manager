@@ -4,7 +4,7 @@ Tags: content management, VIA Platform
 Requires at least: 4.5.3
 Requires PHP 5.4 or later.
 Tested up to: 4.5.3
-Stable tag: 0.2
+Stable tag: 0.3
 License: GPLv2
 
 Manage training (session) content for the VIA Portal.
@@ -13,6 +13,11 @@ Manage training (session) content for the VIA Portal.
 
 
 == ChangeLog ==
+
+== 0.3 ==
+
+* FIX: Use correct text domain (vpmlang)
+* FIX: Renamed to properly handle case sensitive operating systems (Linux)
 
 == 0.2 ==
 
