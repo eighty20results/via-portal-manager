@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-include=(classes css js languages via-portal-manager.php README.txt)
+include=(classes css js languages ld-templates via-portal-manager.php README.txt)
 exclude=(vendor *.yml *.phar composer.*)
 build=(classes/plugin-updates/vendor/*.php)
 short_name="via-portal-manager"
