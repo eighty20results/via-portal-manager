@@ -73,7 +73,7 @@ class vpmView
     	$attr = array(
     		'src' => esc_url( $video_url ),
 		    'width' => '1024',
-		    'preload'   => true,
+		    'preload'   => 'metadata',
 		    'class' => 'vpm-video-embed',
 	    );
 
