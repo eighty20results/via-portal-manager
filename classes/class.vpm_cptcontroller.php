@@ -314,13 +314,13 @@ class vpm_cptController
         $required_settings = apply_filters('vpm_required_sequence_settings', array(
                 'default_playback_order',
                 'live_session_video',
-                'workbook_link',
+//                'workbook_link',
             )
         );
 
         $required_files = apply_filters('vpm_required_sequence_files', array(
-                'coaching_guide_doc',
-                'facilitators_guide_link',
+//                'coaching_guide_doc',
+//                'facilitators_guide_link',
                 'presentation_doc',
             )
         );
