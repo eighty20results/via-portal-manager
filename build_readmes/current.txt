@@ -1,2 +1,3 @@
+FIX: Include the LearnDash template files
 FIX: Use correct text domain (vpmlang)
-FIX: Renamed to properly handle case sensitive operating systems (Linux)
+ENH: Fewer required documents & links for the topic/session

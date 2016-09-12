@@ -3,8 +3,8 @@ Contributors: eighty20results
 Tags: content management, VIA Platform
 Requires at least: 4.5.3
 Requires PHP 5.4 or later.
-Tested up to: 4.5.3
-Stable tag: 0.3
+Tested up to: 4.6.1
+Stable tag: 0.4
 License: GPLv2
 
 Manage training (session) content for the VIA Portal.
@@ -13,6 +13,12 @@ Manage training (session) content for the VIA Portal.
 
 
 == ChangeLog ==
+
+== 0.4 ==
+
+* FIX: Include the LearnDash template files
+* FIX: Use correct text domain (vpmlang)
+* ENH: Fewer required documents & links for the topic/session
 
 == 0.3 ==
 
